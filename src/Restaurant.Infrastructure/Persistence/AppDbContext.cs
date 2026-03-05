@@ -11,6 +11,8 @@ public class AppDbContext : DbContext
     public DbSet<Product> Products => Set<Product>();
     public DbSet<SiteContent> SiteContents => Set<SiteContent>();
 
+    public DbSet<UploadFile> UploadFiles => Set<UploadFile>();
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);

@@ -61,9 +61,9 @@ public static class DbSeeder
             );
 
             db.SiteContents.AddRange(
-                new SiteContent { Key = "Home", Title = "Hoş Geldiniz", Body = "Restoranımıza hoş geldiniz. Taze ve kaliteli ürünlerle hizmetinizdeyiz." },
-                new SiteContent { Key = "About", Title = "Hakkımızda", Body = "Lezzet odaklı, yerel üreticileri destekleyen bir mutfak anlayışı." },
-                new SiteContent { Key = "Contact", Title = "İletişim", Body = "Adres: ...\nTelefon: ...\nÇalışma Saatleri: ..." }
+                new SiteContent { Key = "home", Title = "Hoş Geldiniz", Body = "Restoranımıza hoş geldiniz. Taze ve kaliteli ürünlerle hizmetinizdeyiz." },
+                new SiteContent { Key = "about", Title = "Hakkımızda", Body = "Lezzet odaklı, yerel üreticileri destekleyen bir mutfak anlayışı." },
+                new SiteContent { Key = "contact", Title = "İletişim", Body = "Adres: ...\nTelefon: ...\nÇalışma Saatleri: ..." }
             );
 
             await db.SaveChangesAsync();
