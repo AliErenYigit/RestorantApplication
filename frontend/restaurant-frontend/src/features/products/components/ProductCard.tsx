@@ -3,11 +3,16 @@ import { getImageUrl } from "@/shared/lib/getImageUrl";
 
 type ProductCardProps = {
   product: Product;
+  onClick?: (product: Product) => void;
 };
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, onClick }: ProductCardProps) {
   return (
-    <article className="overflow-hidden rounded-md border border-slate-200 bg-white shadow-sm transition hover:shadow-md">
+    <article
+      onClick={() => onClick?.(product)}
+      className="overflow-hidden rounded-md border border-slate-200 bg-white shadow-sm transition hover:shadow-md cursor-pointer"
+    >
+     
       <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-start sm:p-4">
         <div className="h-44 w-full shrink-0 overflow-hidden rounded bg-slate-100 sm:w-[200px]">
           {product.imageUrl ? (
