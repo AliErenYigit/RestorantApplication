@@ -7,12 +7,24 @@ using Restaurant.Infrastructure.Services.Admin;
 using Restaurant.Api.Security;
 using System.Threading.RateLimiting;
 using Restaurant.Infrastructure.Security;
+using Restaurant.Infrastructure.Services;
 
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontendPolicy", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -72,8 +84,13 @@ builder.Services.AddScoped<IAdminCategoryService, AdminCategoryService>();
 builder.Services.AddScoped<IAdminProductService, AdminProductService>();
 builder.Services.AddScoped<IAdminContentService, AdminContentService>();
 
+builder.Services.AddScoped<IAdminCommentService, AdminCommentService>();
+
 builder.Services.AddScoped<IPublicMenuQuery, PublicMenuQuery>();
 builder.Services.AddScoped<IPublicContentQuery, PublicContentQuery>();
+
+builder.Services.AddScoped<ITeamMemberService, TeamMemberService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 
 // DbContext
 builder.Services.AddDbContext<AppDbContext>(opt =>
@@ -103,6 +120,7 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<Restaurant.Api.Middleware.ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
+app.UseCors("FrontendPolicy");
 app.MapControllers();
 
 app.UseStaticFiles();

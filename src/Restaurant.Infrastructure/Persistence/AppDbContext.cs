@@ -12,6 +12,9 @@ public class AppDbContext : DbContext
     public DbSet<SiteContent> SiteContents => Set<SiteContent>();
 
     public DbSet<UploadFile> UploadFiles => Set<UploadFile>();
+
+    public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
+public DbSet<Comment> Comments => Set<Comment>();
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

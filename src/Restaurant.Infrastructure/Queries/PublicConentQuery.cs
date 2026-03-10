@@ -21,7 +21,7 @@ public sealed class PublicContentQuery : IPublicContentQuery
         return await _db.SiteContents
             .AsNoTracking()
             .Where(x => x.Key.ToLower() == normalized.ToLower())
-            .Select(x => new SiteContentDto(x.Key, x.Title, x.Body, x.UpdatedAt))
+            .Select(x => new SiteContentDto(x.Key, x.Title, x.Body,x.ImageUrl, x.UpdatedAt))
             .FirstOrDefaultAsync(ct);
     }
 

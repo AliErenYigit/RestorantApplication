@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Restaurant.Api.Security;
 using Restaurant.Application.DTOs.Admin;
 using Restaurant.Application.Interfaces.Admin;
-using Microsoft.AspNetCore.RateLimiting;
 
 namespace Restaurant.Api.Controllers.Admin;
 
@@ -23,10 +23,20 @@ public class AdminContentController : ControllerBase
     public async Task<IActionResult> Get(string key, CancellationToken ct)
     {
         var item = await _service.GetByKeyAsync(key, ct);
-        return item is null ? NotFound() : Ok(item);
+
+        if (item is null)
+            return NotFound();
+
+        return Ok(item);
     }
 
     [HttpPut("{key}")]
-    public async Task<IActionResult> Upsert(string key, [FromBody] SiteContentUpdateRequest req, CancellationToken ct)
-        => Ok(await _service.UpsertAsync(key, req, ct));
+    public async Task<IActionResult> Upsert(
+        string key,
+        [FromBody] SiteContentUpdateRequest req,
+        CancellationToken ct)
+    {
+        var result = await _service.UpsertAsync(key, req, ct);
+        return Ok(result);
+    }
 }
