@@ -45,7 +45,7 @@ export function ProductDetailModal({
         type="button"
         onClick={onClose}
         className={[
-          "absolute inset-0 bg-black/50 transition-opacity duration-300",
+          "absolute inset-0 bg-slate-900/30 transition-opacity duration-300",
           visible ? "opacity-100" : "opacity-0",
         ].join(" ")}
         aria-label="Modal arka planı"
@@ -53,7 +53,7 @@ export function ProductDetailModal({
 
       <div
         className={[
-          "relative max-h-[95vh] w-full overflow-hidden rounded-t-3xl bg-white shadow-2xl transition-all duration-300 md:max-w-2xl md:rounded-3xl",
+          "relative max-h-[95vh] w-full overflow-hidden rounded-t-[2rem] border border-cyan-100 bg-white shadow-[0_24px_60px_rgba(6,182,212,0.16)] transition-all duration-300 md:max-w-2xl md:rounded-[2rem]",
           visible
             ? "translate-y-0 scale-100 opacity-100"
             : "translate-y-8 scale-95 opacity-0",
@@ -75,7 +75,7 @@ export function ProductDetailModal({
           <button
             type="button"
             onClick={onClose}
-            className="absolute right-4 top-4 rounded-full bg-white/90 px-3 py-2 text-sm font-semibold text-slate-900 shadow transition hover:bg-white"
+            className="absolute right-4 top-4 rounded-full border border-white/70 bg-white/90 px-3 py-2 text-sm font-semibold text-slate-900 shadow transition hover:bg-white"
           >
             Kapat
           </button>
@@ -87,10 +87,12 @@ export function ProductDetailModal({
               <h2 className="text-2xl font-bold text-slate-900">
                 {product.name}
               </h2>
-            
+              <p className="mt-1 text-sm text-slate-500">
+                Ürün detay bilgileri
+              </p>
             </div>
 
-            <div className="rounded-2xl bg-slate-900 px-4 py-2 text-lg font-bold text-white">
+            <div className="rounded-2xl bg-teal-50 px-4 py-2 text-lg font-bold text-teal-700">
               ₺
               {Number(product.price).toLocaleString("tr-TR", {
                 minimumFractionDigits: 2,
@@ -101,7 +103,9 @@ export function ProductDetailModal({
 
           <div className="mt-6 space-y-5">
             <div>
-            
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                Açıklama
+              </h3>
               <p className="mt-2 text-sm leading-7 text-slate-700">
                 {product.description || "Bu ürün için açıklama eklenmemiş."}
               </p>

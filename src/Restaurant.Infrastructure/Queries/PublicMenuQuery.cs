@@ -21,7 +21,7 @@ public sealed class PublicMenuQuery : IPublicMenuQuery
             .Where(c => c.IsActive)
             .OrderBy(c => c.SortOrder)
             .ThenBy(c => c.Name)
-            .Select(c => new CategoryDto(c.Id, c.Name, c.Slug, c.SortOrder))
+            .Select(c => new CategoryDto(c.Id, c.Name, c.Slug, c.SortOrder,c.IsActive))
             .ToListAsync(ct);
     }
 

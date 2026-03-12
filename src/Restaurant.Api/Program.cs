@@ -83,6 +83,7 @@ builder.Services.AddScoped<IFileScanner, ClamAvFileScanner>();
 builder.Services.AddScoped<IAdminCategoryService, AdminCategoryService>();
 builder.Services.AddScoped<IAdminProductService, AdminProductService>();
 builder.Services.AddScoped<IAdminContentService, AdminContentService>();
+builder.Services.AddScoped<IAdminTeamMemberService, AdminTeamMemberService>();
 
 builder.Services.AddScoped<IAdminCommentService, AdminCommentService>();
 

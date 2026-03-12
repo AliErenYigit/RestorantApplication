@@ -6,4 +6,5 @@ export interface Product {
   description?: string | null;
   imageUrl?: string | null;
   sortOrder?: number;
+  isActive: boolean;
 }

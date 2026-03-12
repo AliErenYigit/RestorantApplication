@@ -34,29 +34,5 @@ public sealed class TeamMemberService : ITeamMemberService
             .ToListAsync(ct);
     }
 
-    public async Task<TeamMemberDto> CreateAsync(CreateTeamMemberRequest request, CancellationToken ct = default)
-    {
-        var entity = new TeamMember
-        {
-            FullName = request.FullName.Trim(),
-            Role = request.Role.Trim(),
-            Bio = string.IsNullOrWhiteSpace(request.Bio) ? null : request.Bio.Trim(),
-            ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl.Trim(),
-            SortOrder = request.SortOrder,
-            IsActive = request.IsActive,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        _db.TeamMembers.Add(entity);
-        await _db.SaveChangesAsync(ct);
-
-        return new TeamMemberDto(
-            entity.Id,
-            entity.FullName,
-            entity.Role,
-            entity.Bio,
-            entity.ImageUrl,
-            entity.SortOrder
-        );
-    }
+    
 }

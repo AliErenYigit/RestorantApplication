@@ -16,44 +16,43 @@ public sealed class AdminProductService : IAdminProductService
 
     public AdminProductService(AppDbContext db) => _db = db;
 
-    public async Task<PagedResult<ProductDto>> GetAllAsync(ProductListQuery query, CancellationToken ct = default)
-{
-    var page = query.Page < 1 ? 1 : query.Page;
-    var pageSize = query.PageSize is < 1 or > 200 ? 20 : query.PageSize;
-
-    var q = _db.Products.AsNoTracking().AsQueryable();
-
-    if (query.CategoryId.HasValue)
-        q = q.Where(x => x.CategoryId == query.CategoryId.Value);
-
-    if (query.IsActive.HasValue)
-        q = q.Where(x => x.IsActive == query.IsActive.Value);
-
-    if (!string.IsNullOrWhiteSpace(query.Search))
+    public async Task<PagedResult<AdminProductDto>> GetAllAsync(ProductListQuery query, CancellationToken ct = default)
     {
-        var s = query.Search.Trim();
-        q = q.Where(x => x.Name.Contains(s) || x.Description.Contains(s));
+        var page = query.Page < 1 ? 1 : query.Page;
+        var pageSize = query.PageSize is < 1 or > 200 ? 20 : query.PageSize;
+
+        var q = _db.Products.AsNoTracking().AsQueryable();
+
+        if (query.CategoryId.HasValue)
+            q = q.Where(x => x.CategoryId == query.CategoryId.Value);
+
+        
+
+        if (!string.IsNullOrWhiteSpace(query.Search))
+        {
+            var s = query.Search.Trim();
+            q = q.Where(x => x.Name.Contains(s) || x.Description.Contains(s));
+        }
+
+        var total = await q.CountAsync(ct);
+
+        var items = await q
+            .OrderBy(x => x.SortOrder).ThenBy(x => x.Name)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(x => new AdminProductDto(x.Id, x.CategoryId, x.Name, x.Price, x.Description, x.ImageUrl, x.SortOrder, x.IsActive))
+            .ToListAsync(ct);
+
+        return new PagedResult<AdminProductDto>(page, pageSize, total, items);
     }
 
-    var total = await q.CountAsync(ct);
-
-    var items = await q
-        .OrderBy(x => x.SortOrder).ThenBy(x => x.Name)
-        .Skip((page - 1) * pageSize)
-        .Take(pageSize)
-        .Select(x => new ProductDto(x.Id, x.CategoryId, x.Name, x.Price, x.Description, x.ImageUrl, x.SortOrder))
-        .ToListAsync(ct);
-
-    return new PagedResult<ProductDto>(page, pageSize, total, items);
-}   
-
-    public async Task<ProductDto?> GetByIdAsync(int id, CancellationToken ct = default)
+    public async Task<AdminProductDto?> GetByIdAsync(int id, CancellationToken ct = default)
         => await _db.Products.AsNoTracking()
             .Where(x => x.Id == id)
-            .Select(x => new ProductDto(x.Id, x.CategoryId, x.Name, x.Price, x.Description, x.ImageUrl, x.SortOrder))
+            .Select(x => new AdminProductDto(x.Id, x.CategoryId, x.Name, x.Price, x.Description, x.ImageUrl, x.SortOrder, x.IsActive))
             .FirstOrDefaultAsync(ct);
 
-    public async Task<ProductDto> CreateAsync(ProductUpsertRequest req, CancellationToken ct = default)
+    public async Task<AdminProductDto> CreateAsync(ProductUpsertRequest req, CancellationToken ct = default)
     {
         var errors = Validate(req);
         if (errors.Count > 0)
@@ -62,7 +61,7 @@ public sealed class AdminProductService : IAdminProductService
         var catExists = await _db.Categories.AnyAsync(x => x.Id == req.CategoryId, ct);
         if (!catExists) throw new AppNotFoundException("Category not found.");
 
-        var entity = new Domain.Entities.Product
+        var entity = new Product
         {
             CategoryId = req.CategoryId,
             Name = req.Name.Trim(),
@@ -76,10 +75,10 @@ public sealed class AdminProductService : IAdminProductService
         _db.Products.Add(entity);
         await _db.SaveChangesAsync(ct);
 
-        return new ProductDto(entity.Id, entity.CategoryId, entity.Name, entity.Price, entity.Description, entity.ImageUrl, entity.SortOrder);
+        return new AdminProductDto(entity.Id, entity.CategoryId, entity.Name, entity.Price, entity.Description, entity.ImageUrl, entity.SortOrder, entity.IsActive);
     }
 
-    public async Task<ProductDto?> UpdateAsync(int id, ProductUpsertRequest req, CancellationToken ct = default)
+    public async Task<AdminProductDto?> UpdateAsync(int id, ProductUpsertRequest req, CancellationToken ct = default)
     {
         var entity = await _db.Products.FirstOrDefaultAsync(x => x.Id == id, ct);
         if (entity is null) return null;
@@ -101,19 +100,43 @@ public sealed class AdminProductService : IAdminProductService
 
         await _db.SaveChangesAsync(ct);
 
-        return new ProductDto(entity.Id, entity.CategoryId, entity.Name, entity.Price, entity.Description, entity.ImageUrl, entity.SortOrder);
+        return new AdminProductDto(entity.Id, entity.CategoryId, entity.Name, entity.Price, entity.Description, entity.ImageUrl, entity.SortOrder, entity.IsActive);
     }
 
- public async Task<bool> DeleteAsync(int id, CancellationToken ct = default)
-{
-    var entity = await _db.Products.FirstOrDefaultAsync(x => x.Id == id, ct);
-    if (entity is null) return false;
+    public async Task<bool> DeleteAsync(int id, CancellationToken ct = default)
+    {
+        var entity = await _db.Products.FirstOrDefaultAsync(x => x.Id == id, ct);
+        if (entity is null) return false;
 
-    entity.IsActive = false; // soft delete
 
-    await _db.SaveChangesAsync(ct);
-    return true;
-}
+        _db.Products.Remove(entity);
+
+        await _db.SaveChangesAsync(ct);
+        return true;
+    }
+
+    public async Task<AdminProductDto?> SetActiveAsync(int id, bool isActive, CancellationToken ct = default)
+    {
+        var entity = await _db.Products.FirstOrDefaultAsync(x => x.Id == id, ct);
+        if (entity is null)
+            return null;
+
+        entity.IsActive = isActive;
+
+        await _db.SaveChangesAsync(ct);
+
+        return new AdminProductDto(
+            entity.Id,
+            entity.CategoryId,
+            entity.Name,
+            entity.Price,
+            entity.Description,
+            entity.ImageUrl,
+            entity.SortOrder,
+            entity.IsActive
+        );
+    }
+   
     private static Dictionary<string, string[]> Validate(ProductUpsertRequest req)
     {
         var errors = new Dictionary<string, string[]>();

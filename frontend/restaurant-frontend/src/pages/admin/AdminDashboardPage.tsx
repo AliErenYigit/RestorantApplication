@@ -6,6 +6,11 @@ const cards = [
     description: "Kategoriye göre ürün ekleyin ve ürünleri önizleyin.",
     to: "/admin/menu",
   },
+   {
+    title: "Kategori Yönetimi",
+    description: "Kategorileri ekleyin, düzenleyin ve silin.",
+    to: "/admin/categories",
+  },
   {
     title: "İçerik Yönetimi",
     description: "Anasayfa gibi içerikleri güncelleyin.",
@@ -16,11 +21,13 @@ const cards = [
     description: "Ekip üyelerini ekleyin.",
     to: "/admin/members",
   },
+  
   {
     title: "Yorumlar",
     description: "Yorumları görüntüleyin ve onaylayın.",
     to: "/admin/comments",
   },
+  
 ];
 
 export function AdminDashboardPage() {

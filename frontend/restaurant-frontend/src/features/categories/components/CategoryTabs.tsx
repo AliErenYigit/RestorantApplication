@@ -12,8 +12,8 @@ export function CategoryTabs({
   onSelectCategory,
 }: CategoryTabsProps) {
   return (
-    <div className="w-full overflow-x-auto">
-      <div className="mx-auto flex min-w-max justify-center border-b border-slate-300">
+    <div className="overflow-x-auto pb-2">
+      <div className="flex min-w-max gap-3">
         {categories.map((category) => {
           const isActive = activeCategoryId === category.id;
 
@@ -23,17 +23,13 @@ export function CategoryTabs({
               type="button"
               onClick={() => onSelectCategory(category.id)}
               className={[
-                "relative px-5 py-4 text-base font-medium whitespace-nowrap transition md:px-8 md:text-[18px]",
+                "rounded-full px-4 py-2.5 text-sm font-semibold transition-all duration-200",
                 isActive
-                  ? "text-slate-700"
-                  : "text-slate-400 hover:text-slate-600",
+                  ? "bg-[#14b8a6] text-white shadow-md shadow-teal-100"
+                  : "border border-cyan-100 bg-white text-slate-700 hover:-translate-y-0.5 hover:bg-cyan-50 hover:text-slate-900",
               ].join(" ")}
             >
               {category.name}
-
-              {isActive ? (
-                <span className="absolute bottom-[-1px] left-0 h-[3px] w-full bg-slate-500" />
-              ) : null}
             </button>
           );
         })}

@@ -8,6 +8,7 @@ import { AdminMenuPage } from "../../pages/admin/AdminMenuPage";
 import { AdminContentPage } from "../../pages/admin/AdminContentPage";
 import { AdminMembersPage } from "../../pages/admin/AdminMembersPage";
 import { AdminCommentsPage } from "../../pages/admin/AdminCommentsPage";
+import { AdminCategoryPage } from "../../pages/admin/AdminCategoryPage";
 
 export const router = createBrowserRouter([
   {
@@ -27,6 +28,8 @@ export const router = createBrowserRouter([
       { path: "content", element: <AdminContentPage /> },
       { path: "members", element: <AdminMembersPage /> },
       { path: "comments", element: <AdminCommentsPage /> },
+      { path: "categories",element: <AdminCategoryPage />,
+}
     ],
   },
 ]);

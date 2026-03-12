@@ -26,6 +26,8 @@ public class AdminCategoriesController : ControllerBase
     public async Task<IActionResult> GetAll(CancellationToken ct)
         => Ok(await _service.GetAllAsync(ct));
 
+        
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id, CancellationToken ct)
     {
@@ -48,10 +50,34 @@ public async Task<IActionResult> Create(CategoryUpsertRequest req, CancellationT
         return updated is null ? NotFound() : Ok(updated);
     }
 
-    [HttpDelete("{id:int}")]
-    public async Task<IActionResult> Delete(int id, CancellationToken ct)
+    [HttpPatch("{id:int}/toggle-active")]
+    public async Task<IActionResult> ToggleCategoryActive(
+        int id,
+        [FromBody] ToggleCategoryActiveRequest request,
+        CancellationToken ct)
     {
-        var ok = await _service.DeleteAsync(id, ct);
-        return ok ? NoContent() : NotFound();
+        var result = await _service.SetActiveAsync(id, request.IsActive, ct);
+
+        if (result is null)
+            return NotFound(new { message = "Kategori bulunamadı." });
+
+        return Ok(new
+        {
+            message = request.IsActive
+                ? "Kategori başarıyla aktifleştirildi."
+                : "Kategori başarıyla pasifleştirildi.",
+            category = result
+        });
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteCategory(int id, CancellationToken ct)
+    {
+        var deleted = await _service.DeleteAsync(id, ct);
+
+        if (!deleted)
+            return NotFound(new { message = "Kategori bulunamadı." });
+
+        return Ok(new { message = "Kategori başarıyla silindi." });
     }
 }

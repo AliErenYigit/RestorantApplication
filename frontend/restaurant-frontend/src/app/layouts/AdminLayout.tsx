@@ -7,9 +7,11 @@ import {
 const navItems = [
   { to: "/admin", label: "Dashboard", end: true },
   { to: "/admin/menu", label: "Menü Yönetimi" },
+  { to: "/admin/categories", label: "Kategori Yönetimi" },
   { to: "/admin/content", label: "İçerik Yönetimi" },
   { to: "/admin/members", label: "Çalışanlarımız" },
   { to: "/admin/comments", label: "Yorumlar" },
+  
 ];
 
 export function AdminLayout() {
@@ -44,6 +46,7 @@ export function AdminLayout() {
                 >
                   {item.label}
                 </NavLink>
+                
               ))}
 
               <div className="mt-4 border-t border-slate-800 pt-4">

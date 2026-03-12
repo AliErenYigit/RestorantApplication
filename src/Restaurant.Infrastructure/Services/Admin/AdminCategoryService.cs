@@ -16,16 +16,26 @@ public sealed class AdminCategoryService : IAdminCategoryService
 
     public AdminCategoryService(AppDbContext db) => _db = db;
 
-    public async Task<IReadOnlyList<CategoryDto>> GetAllAsync(CancellationToken ct = default)
-        => await _db.Categories.AsNoTracking()
-            .OrderBy(x => x.SortOrder).ThenBy(x => x.Name)
-            .Select(x => new CategoryDto(x.Id, x.Name, x.Slug, x.SortOrder))
+     public async Task<IReadOnlyList<CategoryDto>> GetAllAsync(CancellationToken ct = default)
+    {
+        return await _db.Categories
+            .AsNoTracking()
+            .OrderBy(x => x.SortOrder)
+            .ThenBy(x => x.Name)
+            .Select(x => new CategoryDto(
+                x.Id,
+                x.Name,
+                x.Slug,
+                x.SortOrder,
+                x.IsActive
+            ))
             .ToListAsync(ct);
+    }
 
     public async Task<CategoryDto?> GetByIdAsync(int id, CancellationToken ct = default)
         => await _db.Categories.AsNoTracking()
             .Where(x => x.Id == id)
-            .Select(x => new CategoryDto(x.Id, x.Name, x.Slug, x.SortOrder))
+            .Select(x => new CategoryDto(x.Id, x.Name, x.Slug, x.SortOrder,x.IsActive))
             .FirstOrDefaultAsync(ct);
 
     public async Task<CategoryDto> CreateAsync(CategoryUpsertRequest req, CancellationToken ct = default)
@@ -51,7 +61,7 @@ public sealed class AdminCategoryService : IAdminCategoryService
         _db.Categories.Add(entity);
         await _db.SaveChangesAsync(ct);
 
-        return new CategoryDto(entity.Id, entity.Name, entity.Slug, entity.SortOrder);
+        return new CategoryDto(entity.Id, entity.Name, entity.Slug, entity.SortOrder,entity.IsActive);
     }
 
     public async Task<CategoryDto?> UpdateAsync(int id, CategoryUpsertRequest req, CancellationToken ct = default)
@@ -75,7 +85,7 @@ public sealed class AdminCategoryService : IAdminCategoryService
         entity.IsActive = req.IsActive;
 
         await _db.SaveChangesAsync(ct);
-        return new CategoryDto(entity.Id, entity.Name, entity.Slug, entity.SortOrder);
+        return new CategoryDto(entity.Id, entity.Name, entity.Slug, entity.SortOrder,entity.IsActive);
     }
 
  public async Task<bool> DeleteAsync(int id, CancellationToken ct = default)
@@ -88,12 +98,31 @@ public sealed class AdminCategoryService : IAdminCategoryService
     if (hasProducts)
         throw new AppConflictException("This category has products. Deactivate it instead of deleting.");
 
-    // Soft delete: pasife çek
-    entity.IsActive = false;
-
+ 
+   
+    _db.Categories.Remove(entity);
     await _db.SaveChangesAsync(ct);
     return true;
 }
+public async Task<CategoryDto?> SetActiveAsync(int id, bool isActive, CancellationToken ct = default)
+    {
+        var entity = await _db.Categories.FirstOrDefaultAsync(x => x.Id == id, ct);
+        if (entity is null)
+            return null;
+
+        entity.IsActive = isActive;
+
+        await _db.SaveChangesAsync(ct);
+
+        return new CategoryDto(
+            entity.Id,
+            entity.Name,
+            entity.Slug,
+            entity.SortOrder,
+            entity.IsActive
+        );
+    }
+
 
     private static Dictionary<string, string[]> Validate(CategoryUpsertRequest req)
     {

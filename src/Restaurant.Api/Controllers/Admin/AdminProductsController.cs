@@ -23,12 +23,11 @@ public class AdminProductsController : ControllerBase
 public async Task<IActionResult> GetAll(
     [FromQuery] int? categoryId,
     [FromQuery] string? search,
-    [FromQuery] bool? isActive,
     [FromQuery] int page = 1,
     [FromQuery] int pageSize = 20,
     CancellationToken ct = default)
 {
-    var query = new ProductListQuery(categoryId, search, isActive, page, pageSize);
+    var query = new ProductListQuery(categoryId, search, page, pageSize);
     return Ok(await _service.GetAllAsync(query, ct));
 }
 
@@ -48,6 +47,26 @@ public async Task<IActionResult> GetAll(
     {
         var updated = await _service.UpdateAsync(id, req, ct);
         return updated is null ? NotFound() : Ok(updated);
+    }
+
+    [HttpPatch("{id:int}/toggle-active")]
+    public async Task<IActionResult> ToggleProductActive(
+        int id,
+        [FromBody] ToggleProductActiveRequest request,
+        CancellationToken ct)
+    {
+        var result = await _service.SetActiveAsync(id, request.IsActive, ct);
+
+        if (result is null)
+            return NotFound(new { message = "Ürün bulunamadı." });
+
+        return Ok(new
+        {
+            message = request.IsActive
+                ? "Ürün başarıyla aktifleştirildi."
+                : "Ürün başarıyla pasifleştirildi.",
+            category = result
+        });
     }
 
     [HttpDelete("{id:int}")]
