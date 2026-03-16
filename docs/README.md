@@ -203,5 +203,5 @@ Bu proje bir restoran için **QR tabanlı dijital menü sisteminin nasıl geliş
 
 ---
 
-#https://www.alierenygt.com.tr/Projects/Detail/6
+## https://www.alierenygt.com.tr/Projects/Detail/6
 
